@@ -15,7 +15,10 @@ public class Main {
             int numGeneraciones = 1000;
 
             // Crear algoritmo
-            AlgEvol alg = new AlgEvol(
+            AlgEvol alg = new AlgEvol(TipoSeleccion.TORNEO,
+                    TipoCruce.OX,
+                    TipoMutacion.SWAP,
+                    TipoReemplazo.ELITISMO,
                     tamanoPoblacion,
                     probCruce,
                     probMutacion,
