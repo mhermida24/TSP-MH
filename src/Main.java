@@ -1,121 +1,173 @@
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 public class Main {
 
     public static void main(String[] args) {
 
         try {
-            // Archivos a procesar
-            String[] archivos = {"br17.atsp","p43.atsp"};
+
+            String[] archivos = {"br17.atsp", "p43.atsp"};
             int[][] distancias;
 
-            // Dos configuraciones básicas de parámetros
-            int[] tamanosPoblacion = {50, 100};
+            int[] tamanosPoblacion = {50, 100, 200};
             double[] probsCruce = {0.7, 0.9};
-            double[] probsMutacion = {0.01, 0.05};
+            double[] probsMutacion = {0.01, 0.05, 0.1};
             int numGeneraciones = 1000;
 
-            // Arrays de operadores
             TipoSeleccion[] selecciones = {TipoSeleccion.TORNEO, TipoSeleccion.RULETA};
             TipoCruce[] cruces = {TipoCruce.OX, TipoCruce.PMX};
             TipoMutacion[] mutaciones = {TipoMutacion.SWAP, TipoMutacion.INVERSION};
             TipoReemplazo[] reemplazos = {TipoReemplazo.GENERACIONAL, TipoReemplazo.ELITISMO};
 
-            long tiempoInicio = System.currentTimeMillis(); // inicio del cronómetro
+            PrintWriter writerCSV = new PrintWriter(new FileWriter("resultados.csv"));
+            PrintWriter writerTiempo = new PrintWriter(new FileWriter("tiempos.txt"));
+
+            writerCSV.println("Archivo;Poblacion;ProbCruce;ProbMutacion;Seleccion;Cruce;Mutacion;Reemplazo;PromedioFitness;MejorFitness;Desvio;CostoMejor;Recorrido");
+
+            long tiempoInicioTotal = System.currentTimeMillis();
 
             for (String archivo : archivos) {
+
+                long inicioArchivo = System.currentTimeMillis();
+
                 System.out.println("\n=== Procesando archivo: " + archivo + " ===");
+
                 distancias = ATSPReader.leerATSP(archivo);
 
-                // Mejor solución por archivo
                 Individuo mejorArchivo = null;
                 double mejorFitnessArchivo = Double.NEGATIVE_INFINITY;
-                String parametrosMejorArchivo = "";
 
-                // Recorremos las dos configuraciones básicas
-                for (int config = 0; config < 2; config++) {
+                for (int tamanoPoblacion : tamanosPoblacion) {
+                    for (double probCruce : probsCruce) {
+                        for (double probMutacion : probsMutacion) {
 
-                    int tamanoPoblacion = tamanosPoblacion[config];
-                    double probCruce = probsCruce[config];
-                    double probMutacion = probsMutacion[config];
+                            System.out.println("\nConfiguración:");
+                            System.out.println("Población: " + tamanoPoblacion +
+                                    " Cruce: " + probCruce +
+                                    " Mutación: " + probMutacion);
 
-                    System.out.println("\n=== Configuración básica " + (config + 1) + " ===");
-                    System.out.printf("Población: %d, Cruce: %.2f, Mutación: %.2f, Generaciones: %d%n",
-                            tamanoPoblacion, probCruce, probMutacion, numGeneraciones);
+                            for (TipoSeleccion ts : selecciones) {
+                                for (TipoCruce tc : cruces) {
+                                    for (TipoMutacion tm : mutaciones) {
+                                        for (TipoReemplazo tr : reemplazos) {
 
-                    // Probamos todas las combinaciones de operadores
-                    for (TipoSeleccion ts : selecciones) {
-                        for (TipoCruce tc : cruces) {
-                            for (TipoMutacion tm : mutaciones) {
-                                for (TipoReemplazo tr : reemplazos) {
+                                            double[] fitnessCorridas = new double[3];
 
-                                    // Ejecutar 3 veces la misma combinación
-                                    for (int repeticion = 1; repeticion <= 3; repeticion++) {
+                                            double mejorFitness = Double.NEGATIVE_INFINITY;
+                                            Individuo mejorIndividuo = null;
 
-                                        AlgEvol alg = new AlgEvol(
-                                                ts,
-                                                tc,
-                                                tm,
-                                                tr,
-                                                tamanoPoblacion,
-                                                probCruce,
-                                                probMutacion,
-                                                numGeneraciones,
-                                                distancias
-                                        );
+                                            for (int repeticion = 0; repeticion < 3; repeticion++) {
 
-                                        Individuo mejor = alg.ejecutar();
+                                                AlgEvol alg = new AlgEvol(
+                                                        ts,
+                                                        tc,
+                                                        tm,
+                                                        tr,
+                                                        tamanoPoblacion,
+                                                        probCruce,
+                                                        probMutacion,
+                                                        numGeneraciones,
+                                                        distancias
+                                                );
 
-                                        // Mostrar resultado de esta ejecución
-                                        System.out.printf(
-                                                "Rep %d | Selección: %s | Cruce: %s | Mutación: %s | Reemplazo: %s -> Fitness: %.5f%n",
-                                                repeticion, ts, tc, tm, tr, mejor.getFitness()
-                                        );
+                                                Individuo mejor = alg.ejecutar();
 
-                                        // Mostrar recorrido
-                                        System.out.print("Recorrido: ");
-                                        for (Integer ciudad : mejor.getPermutacion()) {
-                                            System.out.print(ciudad + " ");
-                                        }
-                                        System.out.println();
+                                                fitnessCorridas[repeticion] = mejor.getFitness();
 
-                                        // Actualizar mejor por archivo si corresponde
-                                        if (mejor.getFitness() > mejorFitnessArchivo) {
-                                            mejorArchivo = new Individuo(mejor);
-                                            mejorFitnessArchivo = mejor.getFitness();
-                                            parametrosMejorArchivo = String.format(
-                                                    "Población: %d, Cruce: %.2f, Mutación: %.2f, Generaciones: %d, Selección: %s, CruceOperador: %s, MutaciónOperador: %s, Reemplazo: %s",
-                                                    tamanoPoblacion, probCruce, probMutacion, numGeneraciones,
-                                                    ts, tc, tm, tr
+                                                if (mejor.getFitness() > mejorFitness) {
+                                                    mejorFitness = mejor.getFitness();
+                                                    mejorIndividuo = new Individuo(mejor);
+                                                }
+
+                                                if (mejor.getFitness() > mejorFitnessArchivo) {
+                                                    mejorFitnessArchivo = mejor.getFitness();
+                                                    mejorArchivo = new Individuo(mejor);
+                                                }
+                                            }
+
+                                            double suma = 0;
+                                            for (double f : fitnessCorridas) {
+                                                suma += f;
+                                            }
+
+                                            double promedio = suma / fitnessCorridas.length;
+
+                                            double sumaVar = 0;
+                                            for (double f : fitnessCorridas) {
+                                                sumaVar += Math.pow(f - promedio, 2);
+                                            }
+
+                                            double desvio = Math.sqrt(sumaVar / fitnessCorridas.length);
+
+                                            double costoMejor = 1.0 / mejorFitness;
+
+                                            StringBuilder recorrido = new StringBuilder();
+
+                                            for (int i = 0; i < mejorIndividuo.getPermutacion().size(); i++) {
+                                                recorrido.append(mejorIndividuo.getPermutacion().get(i));
+                                                if (i < mejorIndividuo.getPermutacion().size() - 1) {
+                                                    recorrido.append("-");
+                                                }
+                                            }
+
+                                            writerCSV.println(
+                                                    archivo + ";" +
+                                                            tamanoPoblacion + ";" +
+                                                            probCruce + ";" +
+                                                            probMutacion + ";" +
+                                                            ts + ";" +
+                                                            tc + ";" +
+                                                            tm + ";" +
+                                                            tr + ";" +
+                                                            promedio + ";" +
+                                                            mejorFitness + ";" +
+                                                            desvio + ";" +
+                                                            costoMejor + ";" +
+                                                            recorrido
                                             );
+
                                         }
                                     }
-
                                 }
                             }
+
                         }
                     }
-
                 }
 
-                long tiempoFin = System.currentTimeMillis();
-                double tiempoSegundos = (tiempoFin - tiempoInicio) / 1000.0;
+                long finArchivo = System.currentTimeMillis();
+                double tiempoArchivo = (finArchivo - inicioArchivo) / 1000.0;
 
-                // Mostrar mejor solución para este archivo
-                System.out.println("\n=== Mejor solución lograda para " + archivo + " ===");
+                writerTiempo.println("Archivo: " + archivo + " Tiempo: " + tiempoArchivo + " segundos");
+
+                System.out.println("\nMejor solución para " + archivo);
                 System.out.println("Fitness: " + mejorArchivo.getFitness());
-                System.out.println("Parámetros: " + parametrosMejorArchivo);
+
                 System.out.print("Recorrido: ");
                 for (Integer ciudad : mejorArchivo.getPermutacion()) {
                     System.out.print(ciudad + " ");
                 }
-                System.out.println("\nTiempo acumulado hasta ahora: " + tiempoSegundos + " segundos");
+
+                System.out.println("\nTiempo: " + tiempoArchivo + " segundos");
             }
 
+            long tiempoFinTotal = System.currentTimeMillis();
+            double tiempoTotal = (tiempoFinTotal - tiempoInicioTotal) / 1000.0;
+
+            writerTiempo.println("Tiempo total ejecución: " + tiempoTotal + " segundos");
+
+            writerCSV.close();
+            writerTiempo.close();
+
+            System.out.println("\nResultados guardados en resultados.csv");
+            System.out.println("Tiempos guardados en tiempos.txt");
+
         } catch (IOException e) {
-            System.out.println("Error leyendo el archivo ATSP");
+            System.out.println("Error leyendo archivo ATSP");
             e.printStackTrace();
         }
-
     }
+
 }
