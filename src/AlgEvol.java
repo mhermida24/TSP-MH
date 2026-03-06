@@ -268,36 +268,4 @@ public class AlgEvol {
             }
         }
     }
-
-    public void setTipoSeleccion(TipoSeleccion tipoSeleccion) {
-        this.tipoSeleccion = tipoSeleccion;
-    }
-
-    public void setTipoCruce(TipoCruce tipoCruce) {
-        this.tipoCruce = tipoCruce;
-    }
-
-    public void setTipoMutacion(TipoMutacion tipoMutacion) {
-        this.tipoMutacion = tipoMutacion;
-    }
-
-    public void setTipoReemplazo(TipoReemplazo tipoReemplazo) {
-        this.tipoReemplazo = tipoReemplazo;
-    }
-
-    public void setTamanoPoblacion(int tamanoPoblacion) {
-        this.tamanoPoblacion = tamanoPoblacion;
-    }
-
-    public void setProbCruce(double probCruce) {
-        this.probCruce = probCruce;
-    }
-
-    public void setProbMutacion(double probMutacion) {
-        this.probMutacion = probMutacion;
-    }
-
-    public void setNumGeneraciones(int numGeneraciones) {
-        this.numGeneraciones = numGeneraciones;
-    }
 }
