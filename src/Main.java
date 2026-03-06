@@ -11,9 +11,9 @@ public class Main {
             String[] archivos = {"br17.atsp", "p43.atsp"};
             int[][] distancias;
 
-            int[] tamanosPoblacion = {50, 100, 200};
+            int[] tamanosPoblacion = {50, 100};
             double[] probsCruce = {0.7, 0.9};
-            double[] probsMutacion = {0.01, 0.05, 0.1};
+            double[] probsMutacion = {0.01, 0.05};
             int numGeneraciones = 1000;
 
             TipoSeleccion[] selecciones = {TipoSeleccion.TORNEO, TipoSeleccion.RULETA};
@@ -39,100 +39,103 @@ public class Main {
                 Individuo mejorArchivo = null;
                 double mejorFitnessArchivo = Double.NEGATIVE_INFINITY;
 
-                for (int tamanoPoblacion : tamanosPoblacion) {
-                    for (double probCruce : probsCruce) {
-                        for (double probMutacion : probsMutacion) {
+                int tamanoPoblacion;
+                double probMutacion;
+                double probCruce;
 
-                            System.out.println("\nConfiguración:");
-                            System.out.println("Población: " + tamanoPoblacion +
-                                    " Cruce: " + probCruce +
-                                    " Mutación: " + probMutacion);
+                for (int config = 0; config < 2; config++) {
 
-                            for (TipoSeleccion ts : selecciones) {
-                                for (TipoCruce tc : cruces) {
-                                    for (TipoMutacion tm : mutaciones) {
-                                        for (TipoReemplazo tr : reemplazos) {
+                    tamanoPoblacion = tamanosPoblacion[config];
+                    probCruce = probsCruce[config];
+                    probMutacion = probsMutacion[config];
 
-                                            double[] fitnessCorridas = new double[3];
+                    System.out.println("\nConfiguración:");
+                    System.out.println("Población: " + tamanoPoblacion +
+                            " Cruce: " + probCruce +
+                            " Mutación: " + probMutacion);
 
-                                            double mejorFitness = Double.NEGATIVE_INFINITY;
-                                            Individuo mejorIndividuo = null;
+                    for (TipoSeleccion ts : selecciones) {
+                        for (TipoCruce tc : cruces) {
+                            for (TipoMutacion tm : mutaciones) {
+                                for (TipoReemplazo tr : reemplazos) {
 
-                                            for (int repeticion = 0; repeticion < 3; repeticion++) {
+                                    double[] fitnessCorridas = new double[3];
 
-                                                AlgEvol alg = new AlgEvol(
-                                                        ts,
-                                                        tc,
-                                                        tm,
-                                                        tr,
-                                                        tamanoPoblacion,
-                                                        probCruce,
-                                                        probMutacion,
-                                                        numGeneraciones,
-                                                        distancias
-                                                );
+                                    double mejorFitness = Double.NEGATIVE_INFINITY;
+                                    Individuo mejorIndividuo = null;
 
-                                                Individuo mejor = alg.ejecutar();
+                                    for (int repeticion = 0; repeticion < 3; repeticion++) {
 
-                                                fitnessCorridas[repeticion] = mejor.getFitness();
+                                        AlgEvol alg = new AlgEvol(
+                                                ts,
+                                                tc,
+                                                tm,
+                                                tr,
+                                                tamanoPoblacion,
+                                                probCruce,
+                                                probMutacion,
+                                                numGeneraciones,
+                                                distancias
+                                        );
 
-                                                if (mejor.getFitness() > mejorFitness) {
-                                                    mejorFitness = mejor.getFitness();
-                                                    mejorIndividuo = new Individuo(mejor);
-                                                }
+                                        Individuo mejor = alg.ejecutar();
 
-                                                if (mejor.getFitness() > mejorFitnessArchivo) {
-                                                    mejorFitnessArchivo = mejor.getFitness();
-                                                    mejorArchivo = new Individuo(mejor);
-                                                }
-                                            }
+                                        fitnessCorridas[repeticion] = mejor.getFitness();
 
-                                            double suma = 0;
-                                            for (double f : fitnessCorridas) {
-                                                suma += f;
-                                            }
+                                        if (mejor.getFitness() > mejorFitness) {
+                                            mejorFitness = mejor.getFitness();
+                                            mejorIndividuo = new Individuo(mejor);
+                                        }
 
-                                            double promedio = suma / fitnessCorridas.length;
-
-                                            double sumaVar = 0;
-                                            for (double f : fitnessCorridas) {
-                                                sumaVar += Math.pow(f - promedio, 2);
-                                            }
-
-                                            double desvio = Math.sqrt(sumaVar / fitnessCorridas.length);
-
-                                            double costoMejor = 1.0 / mejorFitness;
-
-                                            StringBuilder recorrido = new StringBuilder();
-
-                                            for (int i = 0; i < mejorIndividuo.getPermutacion().size(); i++) {
-                                                recorrido.append(mejorIndividuo.getPermutacion().get(i));
-                                                if (i < mejorIndividuo.getPermutacion().size() - 1) {
-                                                    recorrido.append("-");
-                                                }
-                                            }
-
-                                            writerCSV.println(
-                                                    archivo + ";" +
-                                                            tamanoPoblacion + ";" +
-                                                            probCruce + ";" +
-                                                            probMutacion + ";" +
-                                                            ts + ";" +
-                                                            tc + ";" +
-                                                            tm + ";" +
-                                                            tr + ";" +
-                                                            promedio + ";" +
-                                                            mejorFitness + ";" +
-                                                            desvio + ";" +
-                                                            costoMejor + ";" +
-                                                            recorrido
-                                            );
-
+                                        if (mejor.getFitness() > mejorFitnessArchivo) {
+                                            mejorFitnessArchivo = mejor.getFitness();
+                                            mejorArchivo = new Individuo(mejor);
                                         }
                                     }
+
+                                    double suma = 0;
+                                    for (double f : fitnessCorridas) {
+                                        suma += f;
+                                    }
+
+                                    double promedio = suma / fitnessCorridas.length;
+
+                                    double sumaVar = 0;
+                                    for (double f : fitnessCorridas) {
+                                        sumaVar += Math.pow(f - promedio, 2);
+                                    }
+
+                                    double desvio = Math.sqrt(sumaVar / fitnessCorridas.length);
+
+                                    double costoMejor = 1.0 / mejorFitness;
+
+                                    StringBuilder recorrido = new StringBuilder();
+
+                                    for (int i = 0; i < mejorIndividuo.getPermutacion().size(); i++) {
+                                        recorrido.append(mejorIndividuo.getPermutacion().get(i));
+                                        if (i < mejorIndividuo.getPermutacion().size() - 1) {
+                                            recorrido.append("-");
+                                        }
+                                    }
+
+                                    writerCSV.println(
+                                            archivo + ";" +
+                                                    tamanoPoblacion + ";" +
+                                                    probCruce + ";" +
+                                                    probMutacion + ";" +
+                                                    ts + ";" +
+                                                    tc + ";" +
+                                                    tm + ";" +
+                                                    tr + ";" +
+                                                    promedio + ";" +
+                                                    mejorFitness + ";" +
+                                                    desvio + ";" +
+                                                    costoMejor + ";" +
+                                                    recorrido
+                                    );
+
                                 }
                             }
-
                         }
                     }
                 }
