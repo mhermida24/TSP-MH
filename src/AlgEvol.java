@@ -117,6 +117,9 @@ public class AlgEvol {
                 break;
             }
         }
+        if (padre == null) {
+            padre = individuos.get(individuos.size() - 1);
+        }
         return padre;
     }
 
