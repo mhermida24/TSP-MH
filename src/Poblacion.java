@@ -20,10 +20,6 @@ public class Poblacion {
         return individuos;
     }
 
-    public Individuo getIndividuo(int index) {
-        return individuos.get(index);
-    }
-
     public void addIndividuo(Individuo ind) {
         individuos.add(ind);
     }
@@ -41,10 +37,5 @@ public class Poblacion {
             }
         }
         return mejor;
-    }
-
-    public void addIndividuos(ArrayList<Individuo> nuevos){
-        for(Individuo i: nuevos)
-            individuos.add(i);
     }
 }
