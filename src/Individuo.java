@@ -6,13 +6,14 @@ public class Individuo {
 
     private ArrayList<Integer> permutacion;
     private double fitness;
+    private static Random rand = new Random();
 
     public Individuo(int cantidadCiudades) {
         permutacion = new ArrayList<>();
         for (int i = 0; i < cantidadCiudades; i++) {
             permutacion.add(i);
         }
-        Collections.shuffle(permutacion, new Random());
+        Collections.shuffle(permutacion, rand);
         fitness = 0;
     }
 
