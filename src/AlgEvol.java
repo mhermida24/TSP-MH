@@ -44,28 +44,12 @@ public class AlgEvol {
                 nuevaPoblacion.addIndividuo(new Individuo(poblacion.getMejor()));
             }
             while (nuevaPoblacion.size() < tamanoPoblacion){
-                Individuo padre1 = null;
-                Individuo padre2 = null;
-                if(tipoSeleccion.TORNEO.equals(tipoSeleccion)) {
-                    padre1 = selecccionarPadreTorneo();
-                    padre2 = selecccionarPadreTorneo();
-                }else if(tipoSeleccion.RULETA.equals(tipoSeleccion)){
-                    padre1 = seleccionarPadreRuleta();
-                    padre2 = seleccionarPadreRuleta();
-                }
-                ArrayList<Individuo> hijos = null;
-                if(TipoCruce.OX.equals(tipoCruce)){
-                    hijos= cruzarOX(padre1, padre2);
-                }else if(TipoCruce.PMX.equals(tipoCruce)) {
-                    hijos = cruzarPMX(padre1, padre2);
-                }
-                if(tipoMutacion.SWAP.equals(tipoMutacion)){
-                    mutarSwap(hijos.get(0));
-                    mutarSwap(hijos.get(1));
-                }else if(tipoMutacion.INVERSION.equals(tipoMutacion)) {
-                    mutarInversion(hijos.get(0));
-                    mutarInversion(hijos.get(1));
-                }
+                Individuo padre1 = seleccionarPadre();
+                Individuo padre2 = seleccionarPadre();
+                ArrayList<Individuo> hijos;
+                hijos = cruzar(padre1, padre2);
+                mutar(hijos.get(0));
+                mutar(hijos.get(1));
                 nuevaPoblacion.addIndividuo(hijos.get(0));
                 if(nuevaPoblacion.size() < tamanoPoblacion){
                     nuevaPoblacion.addIndividuo(hijos.get(1));
@@ -87,13 +71,21 @@ public class AlgEvol {
         }
     }
 
-    private Integer calcularDistancia(ArrayList<Integer> permutacion){
+    private int calcularDistancia(ArrayList<Integer> permutacion){
         int dist = 0;
         for(int i=0; i<permutacion.size()-1;i++){
             dist = dist + distancias[permutacion.get(i)][permutacion.get(i+1)];
         }
         dist = dist + distancias[permutacion.get(permutacion.size()-1)][permutacion.get(0)];
         return dist;
+    }
+
+    private Individuo seleccionarPadre(){
+        if(TipoSeleccion.TORNEO.equals(tipoSeleccion)) {
+            return selecccionarPadreTorneo();
+        }else{
+            return seleccionarPadreRuleta();
+        }
     }
 
     private Individuo selecccionarPadreTorneo(){
@@ -126,6 +118,14 @@ public class AlgEvol {
             }
         }
         return padre;
+    }
+
+    private ArrayList<Individuo> cruzar(Individuo padre1, Individuo padre2){
+        if(TipoCruce.OX.equals(tipoCruce)){
+            return cruzarOX(padre1, padre2);
+        }else{
+            return cruzarPMX(padre1, padre2);
+        }
     }
 
     private ArrayList<Individuo> cruzarOX(Individuo padre1, Individuo padre2){
@@ -229,6 +229,14 @@ public class AlgEvol {
         hijos.add(hijo1);
         hijos.add(hijo2);
         return hijos;
+    }
+
+    private void mutar(Individuo ind){
+        if(TipoMutacion.SWAP.equals(tipoMutacion)){
+            mutarSwap(ind);
+        }else{
+            mutarInversion(ind);
+        }
     }
 
     private void mutarSwap(Individuo ind) {
