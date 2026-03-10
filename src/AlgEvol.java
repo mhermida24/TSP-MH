@@ -68,6 +68,7 @@ public class AlgEvol {
         for(Individuo i: individuos){
             distancia = calcularDistancia(i.getPermutacion());
             i.setFitness(1.0/distancia);
+            i.setCosto(distancia);
         }
     }
 

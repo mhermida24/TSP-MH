@@ -6,6 +6,7 @@ public class Individuo {
 
     private ArrayList<Integer> permutacion;
     private double fitness;
+    private int costo;
     private static Random rand = new Random();
 
     public Individuo(int cantidadCiudades) {
@@ -25,6 +26,7 @@ public class Individuo {
     public Individuo(Individuo i){
         permutacion = new ArrayList<>(i.getPermutacion());
         fitness = i.getFitness();
+        costo = i.getCosto();
     }
 
     public ArrayList<Integer> getPermutacion() {
@@ -38,4 +40,13 @@ public class Individuo {
     public void setFitness(double fitness) {
         this.fitness = fitness;
     }
+
+    public int getCosto() {
+        return costo;
+    }
+
+    public void setCosto(int costo) {
+        this.costo = costo;
+    }
+
 }
