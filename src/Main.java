@@ -32,7 +32,6 @@ public class Main {
 
                 long inicioArchivo = System.currentTimeMillis();
 
-                System.out.println("\n=== Procesando archivo: " + archivo + " ===");
 
                 distancias = ATSPReader.leerATSP(archivo);
 
@@ -49,10 +48,6 @@ public class Main {
                     probCruce = probsCruce[config];
                     probMutacion = probsMutacion[config];
 
-                    System.out.println("\nConfiguración:");
-                    System.out.println("Población: " + tamanoPoblacion +
-                            " Cruce: " + probCruce +
-                            " Mutación: " + probMutacion);
 
                     for (TipoSeleccion ts : selecciones) {
                         for (TipoCruce tc : cruces) {
@@ -107,7 +102,7 @@ public class Main {
 
                                     double desvio = Math.sqrt(sumaVar / fitnessCorridas.length);
 
-                                    double costoMejor = 1.0 / mejorFitness;
+                                    int costoMejor = mejorIndividuo != null ? mejorIndividuo.getCosto() : -1;
 
                                     StringBuilder recorrido = new StringBuilder();
 
@@ -145,27 +140,15 @@ public class Main {
 
                 writerTiempo.println("Archivo: " + archivo + " Tiempo: " + tiempoArchivo + " segundos");
 
-                System.out.println("\nMejor solución para " + archivo);
-                System.out.println("Fitness: " + mejorArchivo.getFitness());
-
-                System.out.print("Recorrido: ");
-                for (Integer ciudad : mejorArchivo.getPermutacion()) {
-                    System.out.print(ciudad + " ");
-                }
-
-                System.out.println("\nTiempo: " + tiempoArchivo + " segundos");
             }
 
-            long tiempoFinTotal = System.currentTimeMillis();
-            double tiempoTotal = (tiempoFinTotal - tiempoInicioTotal) / 1000.0;
+                long tiempoFinTotal = System.currentTimeMillis();
+                double tiempoTotal = (tiempoFinTotal - tiempoInicioTotal) / 1000.0;
 
-            writerTiempo.println("Tiempo total ejecución: " + tiempoTotal + " segundos");
+                writerTiempo.println("Tiempo total ejecución: " + tiempoTotal + " segundos");
 
-            writerCSV.close();
-            writerTiempo.close();
-
-            System.out.println("\nResultados guardados en resultados.csv");
-            System.out.println("Tiempos guardados en tiempos.txt");
+                writerCSV.close();
+                writerTiempo.close();
 
         } catch (IOException e) {
             System.out.println("Error leyendo archivo ATSP");
