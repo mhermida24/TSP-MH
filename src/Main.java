@@ -24,7 +24,7 @@ public class Main {
             PrintWriter writerCSV = new PrintWriter(new FileWriter("resultados.csv"));
             PrintWriter writerTiempo = new PrintWriter(new FileWriter("tiempos.txt"));
 
-            writerCSV.println("Archivo;Poblacion;ProbCruce;ProbMutacion;Seleccion;Cruce;Mutacion;Reemplazo;PromedioFitness;MejorFitness;Desvio;CostoMejor;Recorrido");
+            writerCSV.println("Archivo;Configuracion;Poblacion;ProbCruce;ProbMutacion;PromedioFitness;MejorFitness;Desvio;CostoMejor;Recorrido");
 
             long tiempoInicioTotal = System.currentTimeMillis();
 
@@ -32,22 +32,16 @@ public class Main {
 
                 long inicioArchivo = System.currentTimeMillis();
 
-
                 distancias = ATSPReader.leerATSP(archivo);
 
                 Individuo mejorArchivo = null;
                 double mejorFitnessArchivo = Double.NEGATIVE_INFINITY;
 
-                int tamanoPoblacion;
-                double probMutacion;
-                double probCruce;
-
                 for (int config = 0; config < 2; config++) {
 
-                    tamanoPoblacion = tamanosPoblacion[config];
-                    probCruce = probsCruce[config];
-                    probMutacion = probsMutacion[config];
-
+                    int tamanoPoblacion = tamanosPoblacion[config];
+                    double probCruce = probsCruce[config];
+                    double probMutacion = probsMutacion[config];
 
                     for (TipoSeleccion ts : selecciones) {
                         for (TipoCruce tc : cruces) {
@@ -105,7 +99,6 @@ public class Main {
                                     int costoMejor = mejorIndividuo != null ? mejorIndividuo.getCosto() : -1;
 
                                     StringBuilder recorrido = new StringBuilder();
-
                                     for (int i = 0; i < mejorIndividuo.getPermutacion().size(); i++) {
                                         recorrido.append(mejorIndividuo.getPermutacion().get(i));
                                         if (i < mejorIndividuo.getPermutacion().size() - 1) {
@@ -113,22 +106,20 @@ public class Main {
                                         }
                                     }
 
+                                    String configuracion = ts + "-" + tc + "-" + tm + "-" + tr;
+
                                     writerCSV.println(
                                             archivo + ";" +
+                                                    configuracion + ";" +
                                                     tamanoPoblacion + ";" +
                                                     probCruce + ";" +
                                                     probMutacion + ";" +
-                                                    ts + ";" +
-                                                    tc + ";" +
-                                                    tm + ";" +
-                                                    tr + ";" +
                                                     promedio + ";" +
                                                     mejorFitness + ";" +
                                                     desvio + ";" +
                                                     costoMejor + ";" +
                                                     recorrido
                                     );
-
                                 }
                             }
                         }
@@ -139,21 +130,19 @@ public class Main {
                 double tiempoArchivo = (finArchivo - inicioArchivo) / 1000.0;
 
                 writerTiempo.println("Archivo: " + archivo + " Tiempo: " + tiempoArchivo + " segundos");
-
             }
 
-                long tiempoFinTotal = System.currentTimeMillis();
-                double tiempoTotal = (tiempoFinTotal - tiempoInicioTotal) / 1000.0;
+            long tiempoFinTotal = System.currentTimeMillis();
+            double tiempoTotal = (tiempoFinTotal - tiempoInicioTotal) / 1000.0;
 
-                writerTiempo.println("Tiempo total ejecución: " + tiempoTotal + " segundos");
+            writerTiempo.println("Tiempo total ejecución: " + tiempoTotal + " segundos");
 
-                writerCSV.close();
-                writerTiempo.close();
+            writerCSV.close();
+            writerTiempo.close();
 
         } catch (IOException e) {
             System.out.println("Error leyendo archivo ATSP");
             e.printStackTrace();
         }
     }
-
 }
