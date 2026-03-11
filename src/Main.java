@@ -26,6 +26,9 @@ public class Main {
 
             writerCSV.println("Archivo;Configuracion;Poblacion;ProbCruce;ProbMutacion;PromedioFitness;MejorFitness;Desvio;CostoMejor;Recorrido");
 
+            int totalExperimentos = 192;
+            int experimentoActual = 0;
+
             long tiempoInicioTotal = System.currentTimeMillis();
 
             for (String archivo : archivos) {
@@ -65,6 +68,13 @@ public class Main {
                                                 probMutacion,
                                                 numGeneraciones,
                                                 distancias
+                                        );
+
+                                        System.out.println(
+                                                "[" + experimentoActual + "/" + totalExperimentos + "] " +
+                                                        archivo + " " +
+                                                        ts + "-" + tc + "-" + tm + "-" + tr +
+                                                        " config " + config
                                         );
 
                                         Individuo mejor = alg.ejecutar();
