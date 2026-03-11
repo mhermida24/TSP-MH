@@ -37,7 +37,6 @@ public class Main {
 
                 distancias = ATSPReader.leerATSP(archivo);
 
-                Individuo mejorArchivo = null;
                 double mejorFitnessArchivo = Double.NEGATIVE_INFINITY;
 
                 for (int config = 0; config < 2; config++) {
@@ -88,7 +87,6 @@ public class Main {
 
                                         if (mejor.getFitness() > mejorFitnessArchivo) {
                                             mejorFitnessArchivo = mejor.getFitness();
-                                            mejorArchivo = new Individuo(mejor);
                                         }
                                         experimentoActual++;
                                     }
