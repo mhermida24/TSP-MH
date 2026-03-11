@@ -90,6 +90,7 @@ public class Main {
                                             mejorFitnessArchivo = mejor.getFitness();
                                             mejorArchivo = new Individuo(mejor);
                                         }
+                                        experimentoActual++;
                                     }
 
                                     double suma = 0;
