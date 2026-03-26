@@ -10,8 +10,7 @@ public class AlgEvol {
     private double probCruce;
     private double probMutacion;
     private int numGeneraciones;
-    private int[][] distancias;
-    private Poblacion poblacion;
+    private EvaluadorFitness evaluadorFitness;
     private int cantCiudades;
 
     public AlgEvol(EstrategiaSeleccion estrategiaSeleccion, EstrategiaCruce estrategiaCruce, EstrategiaMutacion estrategiaMutacion, EstrategiaReemplazo estrategiaReemplazo, int tamanoPoblacion, double probCruce, double probMutacion, int numGeneraciones, int[][] distancias){
@@ -23,16 +22,16 @@ public class AlgEvol {
         this.probCruce = probCruce;
         this.probMutacion = probMutacion;
         this.numGeneraciones = numGeneraciones;
-        this.distancias = distancias;
+        this.evaluadorFitness = new EvaluadorFitness(distancias);
         cantCiudades = distancias.length;
     }
 
 
     public Individuo ejecutar(){
         int it = 0;
-        poblacion = new Poblacion(tamanoPoblacion, distancias.length);
+        Poblacion poblacion = new Poblacion(tamanoPoblacion, cantCiudades);
         while(it < numGeneraciones){
-            evaluarPoblacion();
+            evaluadorFitness.evaluarPoblacion(poblacion);
             Poblacion nuevaPoblacion = estrategiaReemplazo.reemplazar(poblacion);
             while (nuevaPoblacion.size() < tamanoPoblacion){
                 Individuo padre1 = estrategiaSeleccion.seleccionar(poblacion);
@@ -49,26 +48,7 @@ public class AlgEvol {
             poblacion = nuevaPoblacion;
             it++;
         }
-        evaluarPoblacion();
+        evaluadorFitness.evaluarPoblacion(poblacion);
         return poblacion.getMejor();
-    }
-
-    private void evaluarPoblacion(){
-        ArrayList<Individuo> individuos = poblacion.getIndividuos();
-        int distancia;
-        for(Individuo i: individuos){
-            distancia = calcularDistancia(i.getPermutacion());
-            i.setFitness(1.0/distancia);
-            i.setCosto(distancia);
-        }
-    }
-
-    private int calcularDistancia(ArrayList<Integer> permutacion){
-        int dist = 0;
-        for(int i=0; i<permutacion.size()-1;i++){
-            dist = dist + distancias[permutacion.get(i)][permutacion.get(i+1)];
-        }
-        dist = dist + distancias[permutacion.get(permutacion.size()-1)][permutacion.get(0)];
-        return dist;
     }
 }
