@@ -38,8 +38,8 @@ public class AlgEvol {
         int it = 0;
         poblacion = new Poblacion(tamanoPoblacion, distancias.length);
         while(it < numGeneraciones){
-            Poblacion nuevaPoblacion = estrategiaReemplazo.reemplazar(poblacion);
             evaluarPoblacion();
+            Poblacion nuevaPoblacion = estrategiaReemplazo.reemplazar(poblacion);
             while (nuevaPoblacion.size() < tamanoPoblacion){
                 Individuo padre1 = estrategiaSeleccion.seleccionar(poblacion);
                 Individuo padre2 = estrategiaSeleccion.seleccionar(poblacion);
