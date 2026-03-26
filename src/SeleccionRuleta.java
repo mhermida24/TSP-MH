@@ -1,13 +1,14 @@
 import java.util.ArrayList;
 import java.util.Random;
 
-public class SeleccionRuleta {
+public class SeleccionRuleta implements EstrategiaSeleccion {
     private static final Random rand = new Random();
 
     public SeleccionRuleta(){
 
     }
 
+    @Override
     public Individuo seleccionar(Poblacion poblacion){
         Individuo padre = null;
         ArrayList<Individuo> individuos = poblacion.getIndividuos();

@@ -4,12 +4,13 @@ import java.util.Random;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
-public class MutacionInversion {
+public class MutacionInversion implements EstrategiaMutacion {
     private static final Random rand = new Random();
 
     public MutacionInversion(){
     }
 
+    @Override
     public void mutar(Individuo individuo, double probMutacion, int cantCiudades){
         double prob = rand.nextDouble();
         if (prob < probMutacion) {

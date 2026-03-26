@@ -1,11 +1,12 @@
 import java.util.ArrayList;
 import java.util.Random;
 
-public class MutacionSwap {
+public class MutacionSwap implements EstrategiaMutacion {
     private static final Random rand = new Random();
     public MutacionSwap(){
     }
 
+    @Override
     public void mutar(Individuo individuo, double probMutacion, int cantCiudades){
         double prob = rand.nextDouble();
         if (prob < probMutacion) {

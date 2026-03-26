@@ -1,12 +1,13 @@
 import java.util.ArrayList;
 import java.util.Random;
 
-public class CruceOX {
+public class CruceOX implements EstrategiaCruce {
     private static final Random rand = new Random();
 
     public CruceOX() {
     }
 
+    @Override
     public ArrayList<Individuo> cruzar(Individuo padre1, Individuo padre2, double probCruce, int cantCiudades){
         ArrayList<Individuo> hijos = new ArrayList<>();
         Individuo hijo1;
