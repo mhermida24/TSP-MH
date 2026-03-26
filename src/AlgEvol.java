@@ -1,8 +1,4 @@
 import java.util.ArrayList;
-import java.util.Random;
-
-import static java.lang.Math.max;
-import static java.lang.Math.min;
 
 public class AlgEvol {
 
@@ -17,7 +13,6 @@ public class AlgEvol {
     private int[][] distancias;
     private Poblacion poblacion;
     private int cantCiudades;
-    private Random rand;
 
     public AlgEvol(EstrategiaSeleccion estrategiaSeleccion, EstrategiaCruce estrategiaCruce, EstrategiaMutacion estrategiaMutacion, EstrategiaReemplazo estrategiaReemplazo, int tamanoPoblacion, double probCruce, double probMutacion, int numGeneraciones, int[][] distancias){
         this.estrategiaSeleccion = estrategiaSeleccion;
@@ -30,7 +25,6 @@ public class AlgEvol {
         this.numGeneraciones = numGeneraciones;
         this.distancias = distancias;
         cantCiudades = distancias.length;
-        this.rand = new Random();
     }
 
 
