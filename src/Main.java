@@ -126,13 +126,18 @@ public class Main {
 
                                     double desvio = Math.sqrt(sumaVar / fitnessCorridas.length);
 
-                                    int costoMejor = mejorIndividuo != null ? mejorIndividuo.getCosto() : -1;
-
+                                    int costoMejor = -1;
                                     StringBuilder recorrido = new StringBuilder();
-                                    for (int i = 0; i < mejorIndividuo.getPermutacion().size(); i++) {
-                                        recorrido.append(mejorIndividuo.getPermutacion().get(i));
-                                        if (i < mejorIndividuo.getPermutacion().size() - 1) {
-                                            recorrido.append("-");
+
+                                    if (mejorIndividuo != null) {
+                                        costoMejor = mejorIndividuo.getCosto();
+
+                                        ArrayList<Integer> permutacion = mejorIndividuo.getPermutacion();
+                                        for (int i = 0; i < permutacion.size(); i++) {
+                                            recorrido.append(permutacion.get(i));
+                                            if (i < permutacion.size() - 1) {
+                                                recorrido.append("-");
+                                            }
                                         }
                                     }
 
