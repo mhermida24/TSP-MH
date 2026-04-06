@@ -55,7 +55,7 @@ public class Main {
 
                 long inicioArchivo = System.currentTimeMillis();
 
-                distancias = ATSPReader.leerATSP(archivo);
+                distancias = ATSPReader.leerMatrizATSP(archivo);
                 EvaluadorFitness evaluador = new EvaluadorFitness(distancias);
                 double mejorFitnessArchivo = Double.NEGATIVE_INFINITY;
 
@@ -65,10 +65,10 @@ public class Main {
                     double probCruce = probsCruce[config];
                     double probMutacion = probsMutacion[config];
 
-                    for (EstrategiaSeleccion ts : selecciones) {
-                        for (EstrategiaCruce tc : cruces) {
-                            for (EstrategiaMutacion tm : mutaciones) {
-                                for (EstrategiaReemplazo tr : reemplazos) {
+                    for (EstrategiaSeleccion estrategiaSeleccion : selecciones) {
+                        for (EstrategiaCruce estrategiaCruce : cruces) {
+                            for (EstrategiaMutacion estrategiaMutacion : mutaciones) {
+                                for (EstrategiaReemplazo estrategiaReemplazo : reemplazos) {
 
                                     double[] fitnessCorridas = new double[3];
 
@@ -77,11 +77,11 @@ public class Main {
 
                                     for (int repeticion = 0; repeticion < 3; repeticion++) {
 
-                                        AlgEvol alg = new AlgEvol(
-                                                ts,
-                                                tc,
-                                                tm,
-                                                tr,
+                                        AlgoritmoEvolutivo algoritmo = new AlgoritmoEvolutivo(
+                                                estrategiaSeleccion,
+                                                estrategiaCruce,
+                                                estrategiaMutacion,
+                                                estrategiaReemplazo,
                                                 evaluador,
                                                 tamanoPoblacion,
                                                 probCruce,
@@ -93,11 +93,11 @@ public class Main {
                                         System.out.println(
                                                 "[" + experimentoActual + "/" + totalExperimentos + "] " +
                                                         archivo + " " +
-                                                        ts.getNombre() + "-" + tc.getNombre() + "-" + tm.getNombre() + "-" + tr.getNombre() +
+                                                        estrategiaSeleccion.getNombre() + "-" + estrategiaCruce.getNombre() + "-" + estrategiaMutacion.getNombre() + "-" + estrategiaReemplazo.getNombre() +
                                                         " config " + config
                                         );
 
-                                        Individuo mejor = alg.ejecutar();
+                                        Individuo mejor = algoritmo.ejecutar();
 
                                         fitnessCorridas[repeticion] = mejor.getFitness();
 
@@ -112,36 +112,19 @@ public class Main {
                                         experimentoActual++;
                                     }
 
-                                    double suma = 0;
-                                    for (double f : fitnessCorridas) {
-                                        suma += f;
-                                    }
+                                    double promedio = getPromedio(fitnessCorridas);
 
-                                    double promedio = suma / fitnessCorridas.length;
-
-                                    double sumaVar = 0;
-                                    for (double f : fitnessCorridas) {
-                                        sumaVar += Math.pow(f - promedio, 2);
-                                    }
-
-                                    double desvio = Math.sqrt(sumaVar / fitnessCorridas.length);
+                                    double desvio = getDesvio(fitnessCorridas, promedio);
 
                                     int costoMejor = -1;
-                                    StringBuilder recorrido = new StringBuilder();
+                                    String recorrido = "";
 
                                     if (mejorIndividuo != null) {
                                         costoMejor = mejorIndividuo.getCosto();
-
-                                        ArrayList<Integer> permutacion = mejorIndividuo.getPermutacion();
-                                        for (int i = 0; i < permutacion.size(); i++) {
-                                            recorrido.append(permutacion.get(i));
-                                            if (i < permutacion.size() - 1) {
-                                                recorrido.append("-");
-                                            }
-                                        }
+                                        recorrido = mejorIndividuo.getRecorridoComoTexto();
                                     }
 
-                                    String configuracion = ts.getNombre() + "-" + tc.getNombre() + "-" + tm.getNombre() + "-" + tr.getNombre();
+                                    String configuracion = estrategiaSeleccion.getNombre() + "-" + estrategiaCruce.getNombre() + "-" + estrategiaMutacion.getNombre() + "-" + estrategiaReemplazo.getNombre();
 
                                     writerCSV.println(
                                             archivo + ";" +
@@ -179,5 +162,25 @@ public class Main {
             System.out.println("Error leyendo archivo ATSP");
             e.printStackTrace();
         }
+    }
+
+    private static double getDesvio(double[] fitnessCorridas, double promedio) {
+        double sumaVar = 0;
+        for (double f : fitnessCorridas) {
+            sumaVar += Math.pow(f - promedio, 2);
+        }
+
+        double desvio = Math.sqrt(sumaVar / fitnessCorridas.length);
+        return desvio;
+    }
+
+    private static double getPromedio(double[] fitnessCorridas) {
+        double suma = 0;
+        for (double f : fitnessCorridas) {
+            suma += f;
+        }
+
+        double promedio = suma / fitnessCorridas.length;
+        return promedio;
     }
 }
