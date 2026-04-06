@@ -57,4 +57,9 @@ public class CruceOX implements EstrategiaCruce {
         hijos.add(hijo2);
         return hijos;
     }
+
+    @Override
+    public String getNombre() {
+        return "OX";
+    }
 }

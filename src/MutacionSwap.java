@@ -22,4 +22,9 @@ public class MutacionSwap implements EstrategiaMutacion {
             permutacion.set(p2, ciudad1);
         }
     }
+
+    @Override
+    public String getNombre() {
+        return "SWAP";
+    }
 }

@@ -1,6 +1,7 @@
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 public class Main {
 
@@ -16,10 +17,29 @@ public class Main {
             double[] probsMutacion = {0.01, 0.05};
             int numGeneraciones = 1000;
 
-            TipoSeleccion[] selecciones = {TipoSeleccion.TORNEO, TipoSeleccion.RULETA};
-            TipoCruce[] cruces = {TipoCruce.OX, TipoCruce.PMX};
-            TipoMutacion[] mutaciones = {TipoMutacion.SWAP, TipoMutacion.INVERSION};
-            TipoReemplazo[] reemplazos = {TipoReemplazo.GENERACIONAL, TipoReemplazo.ELITISMO};
+            ArrayList<EstrategiaSeleccion> selecciones = new ArrayList<>();
+            EstrategiaSeleccion seleccionRuleta = new SeleccionRuleta();
+            EstrategiaSeleccion seleccionTorneo = new SeleccionTorneo(3);
+            selecciones.add(seleccionRuleta);
+            selecciones.add(seleccionTorneo);
+
+            ArrayList<EstrategiaCruce> cruces = new ArrayList<>();
+            EstrategiaCruce cruceOX = new CruceOX();
+            EstrategiaCruce crucePMX = new CrucePMX();
+            cruces.add(cruceOX);
+            cruces.add(crucePMX);
+
+            ArrayList<EstrategiaMutacion> mutaciones = new ArrayList<>();
+            EstrategiaMutacion mutacionSwap = new MutacionSwap();
+            EstrategiaMutacion mutacionInversion = new MutacionInversion();
+            mutaciones.add(mutacionSwap);
+            mutaciones.add(mutacionInversion);
+
+            ArrayList<EstrategiaReemplazo> reemplazos = new ArrayList<>();
+            EstrategiaReemplazo reemplazoGeneracional = new ReemplazoGeneracional();
+            EstrategiaReemplazo reemplazoElitista = new ReemplazoElitismo();
+            reemplazos.add(reemplazoGeneracional);
+            reemplazos.add(reemplazoElitista);
 
             PrintWriter writerCSV = new PrintWriter(new FileWriter("resultados.csv"));
             PrintWriter writerTiempo = new PrintWriter(new FileWriter("tiempos.txt"));
@@ -36,7 +56,7 @@ public class Main {
                 long inicioArchivo = System.currentTimeMillis();
 
                 distancias = ATSPReader.leerATSP(archivo);
-
+                EvaluadorFitness evaluador = new EvaluadorFitness(distancias);
                 double mejorFitnessArchivo = Double.NEGATIVE_INFINITY;
 
                 for (int config = 0; config < 2; config++) {
@@ -45,10 +65,10 @@ public class Main {
                     double probCruce = probsCruce[config];
                     double probMutacion = probsMutacion[config];
 
-                    for (TipoSeleccion ts : selecciones) {
-                        for (TipoCruce tc : cruces) {
-                            for (TipoMutacion tm : mutaciones) {
-                                for (TipoReemplazo tr : reemplazos) {
+                    for (EstrategiaSeleccion ts : selecciones) {
+                        for (EstrategiaCruce tc : cruces) {
+                            for (EstrategiaMutacion tm : mutaciones) {
+                                for (EstrategiaReemplazo tr : reemplazos) {
 
                                     double[] fitnessCorridas = new double[3];
 
@@ -62,6 +82,7 @@ public class Main {
                                                 tc,
                                                 tm,
                                                 tr,
+                                                evaluador,
                                                 tamanoPoblacion,
                                                 probCruce,
                                                 probMutacion,
@@ -72,7 +93,7 @@ public class Main {
                                         System.out.println(
                                                 "[" + experimentoActual + "/" + totalExperimentos + "] " +
                                                         archivo + " " +
-                                                        ts + "-" + tc + "-" + tm + "-" + tr +
+                                                        ts.getNombre() + "-" + tc.getNombre() + "-" + tm.getNombre() + "-" + tr.getNombre() +
                                                         " config " + config
                                         );
 
@@ -115,7 +136,7 @@ public class Main {
                                         }
                                     }
 
-                                    String configuracion = ts + "-" + tc + "-" + tm + "-" + tr;
+                                    String configuracion = ts.getNombre() + "-" + tc.getNombre() + "-" + tm.getNombre() + "-" + tr.getNombre();
 
                                     writerCSV.println(
                                             archivo + ";" +

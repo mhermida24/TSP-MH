@@ -13,7 +13,7 @@ public class AlgEvol {
     private EvaluadorFitness evaluadorFitness;
     private int cantCiudades;
 
-    public AlgEvol(EstrategiaSeleccion estrategiaSeleccion, EstrategiaCruce estrategiaCruce, EstrategiaMutacion estrategiaMutacion, EstrategiaReemplazo estrategiaReemplazo, int tamanoPoblacion, double probCruce, double probMutacion, int numGeneraciones, int[][] distancias){
+    public AlgEvol(EstrategiaSeleccion estrategiaSeleccion, EstrategiaCruce estrategiaCruce, EstrategiaMutacion estrategiaMutacion, EstrategiaReemplazo estrategiaReemplazo, EvaluadorFitness evaluadorFitness, int tamanoPoblacion, double probCruce, double probMutacion, int numGeneraciones, int[][] distancias){
         this.estrategiaSeleccion = estrategiaSeleccion;
         this.estrategiaCruce = estrategiaCruce;
         this.estrategiaMutacion = estrategiaMutacion;
@@ -22,7 +22,7 @@ public class AlgEvol {
         this.probCruce = probCruce;
         this.probMutacion = probMutacion;
         this.numGeneraciones = numGeneraciones;
-        this.evaluadorFitness = new EvaluadorFitness(distancias);
+        this.evaluadorFitness = evaluadorFitness;
         cantCiudades = distancias.length;
     }
 

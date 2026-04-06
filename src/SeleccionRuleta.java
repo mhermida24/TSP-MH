@@ -30,4 +30,9 @@ public class SeleccionRuleta implements EstrategiaSeleccion {
         }
         return padre;
     }
+
+    @Override
+    public String getNombre() {
+        return "RULETA";
+    }
 }

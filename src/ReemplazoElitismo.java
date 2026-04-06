@@ -6,4 +6,9 @@ public class ReemplazoElitismo implements EstrategiaReemplazo{
         poblacionReemplazada.addIndividuo(new Individuo(poblacionActual.getMejor()));
         return poblacionReemplazada;
     }
+
+    @Override
+    public String getNombre() {
+        return "ELITISMO";
+    }
 }

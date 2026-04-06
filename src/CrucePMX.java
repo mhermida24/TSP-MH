@@ -60,4 +60,9 @@ public class CrucePMX implements EstrategiaCruce {
         hijos.add(hijo2);
         return hijos;
     }
+
+    @Override
+    public String getNombre() {
+        return "PMX";
+    }
 }

@@ -32,4 +32,9 @@ public class MutacionInversion implements EstrategiaMutacion {
             }
         }
     }
+
+    @Override
+    public String getNombre() {
+        return "INVERSION";
+    }
 }
