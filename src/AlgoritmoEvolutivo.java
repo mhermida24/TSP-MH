@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class AlgEvol {
+public class AlgoritmoEvolutivo {
     private EstrategiaSeleccion estrategiaSeleccion;
     private EstrategiaCruce estrategiaCruce;
     private EstrategiaMutacion estrategiaMutacion;
@@ -12,9 +12,9 @@ public class AlgEvol {
     private EvaluadorFitness evaluadorFitness;
     private int cantCiudades;
 
-    public AlgEvol(EstrategiaSeleccion estrategiaSeleccion, EstrategiaCruce estrategiaCruce, EstrategiaMutacion estrategiaMutacion,
-                   EstrategiaReemplazo estrategiaReemplazo, EvaluadorFitness evaluadorFitness, int tamanoPoblacion, double probCruce,
-                   double probMutacion, int numGeneraciones, int[][] distancias) {
+    public AlgoritmoEvolutivo(EstrategiaSeleccion estrategiaSeleccion, EstrategiaCruce estrategiaCruce, EstrategiaMutacion estrategiaMutacion,
+                              EstrategiaReemplazo estrategiaReemplazo, EvaluadorFitness evaluadorFitness, int tamanoPoblacion, double probCruce,
+                              double probMutacion, int numGeneraciones, int[][] distancias) {
         this.estrategiaSeleccion = estrategiaSeleccion;
         this.estrategiaCruce = estrategiaCruce;
         this.estrategiaMutacion = estrategiaMutacion;
