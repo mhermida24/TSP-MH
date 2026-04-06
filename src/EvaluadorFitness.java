@@ -3,8 +3,12 @@ import java.util.ArrayList;
 public class EvaluadorFitness {
     private int[][] distancias;
 
-    public EvaluadorFitness(int[][] distancias){
-        this.distancias = distancias;
+    public EvaluadorFitness(int[][] distancias) {
+        this.distancias = new int[distancias.length][];
+
+        for (int i = 0; i < distancias.length; i++) {
+            this.distancias[i] = distancias[i].clone();
+        }
     }
 
     public void evaluarPoblacion(Poblacion poblacion){
