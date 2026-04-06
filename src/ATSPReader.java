@@ -3,7 +3,7 @@ import java.nio.charset.StandardCharsets;
 
 public class ATSPReader {
 
-    public static int[][] leerATSP(String nombreArchivo) throws IOException {
+    public static int[][] leerMatrizATSP(String nombreArchivo) throws IOException {
         BufferedReader br = new BufferedReader(
                 new InputStreamReader(new FileInputStream(nombreArchivo), StandardCharsets.UTF_8)
         );
