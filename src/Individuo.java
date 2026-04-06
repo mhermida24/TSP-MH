@@ -49,4 +49,16 @@ public class Individuo {
         this.costo = costo;
     }
 
+    public String getRecorridoComoTexto() {
+        StringBuilder recorrido = new StringBuilder();
+
+        for (int i = 0; i < permutacion.size(); i++) {
+            recorrido.append(permutacion.get(i));
+            if (i < permutacion.size() - 1) {
+                recorrido.append("-");
+            }
+        }
+        return recorrido.toString();
+    }
+
 }
