@@ -30,7 +30,7 @@ public class Individuo {
     }
 
     public ArrayList<Integer> getPermutacion() {
-        return permutacion;
+        return new ArrayList<>(permutacion);
     }
 
     public double getFitness() {
