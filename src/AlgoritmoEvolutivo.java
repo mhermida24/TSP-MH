@@ -1,55 +1,101 @@
 import java.util.ArrayList;
 
 public class AlgoritmoEvolutivo {
+
     private EstrategiaSeleccion estrategiaSeleccion;
     private EstrategiaCruce estrategiaCruce;
     private EstrategiaMutacion estrategiaMutacion;
     private EstrategiaReemplazo estrategiaReemplazo;
-    private int tamanoPoblacion;
-    private double probCruce;
-    private double probMutacion;
-    private int numGeneraciones;
+
+    private ConfiguracionAE configuracion;
+
     private EvaluadorFitness evaluadorFitness;
+
     private int cantCiudades;
 
-    public AlgoritmoEvolutivo(EstrategiaSeleccion estrategiaSeleccion, EstrategiaCruce estrategiaCruce, EstrategiaMutacion estrategiaMutacion,
-                              EstrategiaReemplazo estrategiaReemplazo, EvaluadorFitness evaluadorFitness, int tamanoPoblacion, double probCruce,
-                              double probMutacion, int numGeneraciones, int[][] distancias) {
+    public AlgoritmoEvolutivo(
+            EstrategiaSeleccion estrategiaSeleccion,
+            EstrategiaCruce estrategiaCruce,
+            EstrategiaMutacion estrategiaMutacion,
+            EstrategiaReemplazo estrategiaReemplazo,
+            EvaluadorFitness evaluadorFitness,
+            ConfiguracionAE configuracion,
+            int[][] distancias
+    ) {
+
         this.estrategiaSeleccion = estrategiaSeleccion;
         this.estrategiaCruce = estrategiaCruce;
         this.estrategiaMutacion = estrategiaMutacion;
         this.estrategiaReemplazo = estrategiaReemplazo;
-        this.tamanoPoblacion = tamanoPoblacion;
-        this.probCruce = probCruce;
-        this.probMutacion = probMutacion;
-        this.numGeneraciones = numGeneraciones;
+
         this.evaluadorFitness = evaluadorFitness;
-        cantCiudades = distancias.length;
+
+        this.configuracion = configuracion;
+
+        this.cantCiudades = distancias.length;
     }
 
-
     public Individuo ejecutar() {
-        int it = 0;
-        Poblacion poblacion = new Poblacion(tamanoPoblacion, cantCiudades);
-        while(it < numGeneraciones){
+
+        int iteracion = 0;
+
+        Poblacion poblacion = new Poblacion(
+                configuracion.getTamanoPoblacion(),
+                cantCiudades
+        );
+
+        while (iteracion < configuracion.getNumGeneraciones()) {
+
             evaluadorFitness.evaluarPoblacion(poblacion);
-            Poblacion nuevaPoblacion = estrategiaReemplazo.reemplazar(poblacion);
-            while (nuevaPoblacion.size() < tamanoPoblacion){
-                Individuo padre1 = estrategiaSeleccion.seleccionar(poblacion);
-                Individuo padre2 = estrategiaSeleccion.seleccionar(poblacion);
-                ArrayList<Individuo> hijos;
-                hijos = estrategiaCruce.cruzar(padre1, padre2, probCruce, cantCiudades);
-                estrategiaMutacion.mutar(hijos.get(0), probMutacion, cantCiudades);
-                estrategiaMutacion.mutar(hijos.get(1), probMutacion, cantCiudades);
+
+            Poblacion nuevaPoblacion =
+                    estrategiaReemplazo.reemplazar(poblacion);
+
+            while (nuevaPoblacion.size() <
+                    configuracion.getTamanoPoblacion()) {
+
+                Individuo padre1 =
+                        estrategiaSeleccion.seleccionar(poblacion);
+
+                Individuo padre2 =
+                        estrategiaSeleccion.seleccionar(poblacion);
+
+                ArrayList<Individuo> hijos =
+                        estrategiaCruce.cruzar(
+                                padre1,
+                                padre2,
+                                configuracion.getProbCruce(),
+                                cantCiudades
+                        );
+
+                estrategiaMutacion.mutar(
+                        hijos.get(0),
+                        configuracion.getProbMutacion(),
+                        cantCiudades
+                );
+
+                estrategiaMutacion.mutar(
+                        hijos.get(1),
+                        configuracion.getProbMutacion(),
+                        cantCiudades
+                );
+
                 nuevaPoblacion.addIndividuo(hijos.get(0));
-                if(nuevaPoblacion.size() < tamanoPoblacion){
+
+                if (nuevaPoblacion.size() <
+                        configuracion.getTamanoPoblacion()) {
+
                     nuevaPoblacion.addIndividuo(hijos.get(1));
                 }
             }
+
             poblacion = nuevaPoblacion;
-            it++;
+
+            iteracion++;
         }
+
         evaluadorFitness.evaluarPoblacion(poblacion);
+
         return poblacion.getMejor();
     }
 }
