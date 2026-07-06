@@ -2,6 +2,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class Main {
 
@@ -24,10 +25,7 @@ public class Main {
 
         try (
                 PrintWriter writerCSV =
-                        new PrintWriter(new FileWriter("resultados.csv"));
-
-                PrintWriter writerTiempo =
-                        new PrintWriter(new FileWriter("tiempos.txt"))
+                        new PrintWriter(new FileWriter("resultados.csv"))
         ) {
 
             escribirCabeceraCSV(writerCSV);
@@ -44,8 +42,6 @@ public class Main {
             ArrayList<EstrategiaReemplazo> reemplazos =
                     crearReemplazos();
 
-            long inicioTotal = System.currentTimeMillis();
-
             for (String archivo : ARCHIVOS) {
 
                 ejecutarExperimentosArchivo(
@@ -54,19 +50,9 @@ public class Main {
                         cruces,
                         mutaciones,
                         reemplazos,
-                        writerCSV,
-                        writerTiempo
+                        writerCSV
                 );
             }
-
-            double tiempoTotal =
-                    calcularTiempoSegundos(inicioTotal);
-
-            writerTiempo.println(
-                    "Tiempo total ejecución: "
-                            + tiempoTotal +
-                            " segundos"
-            );
 
         } catch (IOException e) {
 
@@ -82,11 +68,8 @@ public class Main {
             ArrayList<EstrategiaCruce> cruces,
             ArrayList<EstrategiaMutacion> mutaciones,
             ArrayList<EstrategiaReemplazo> reemplazos,
-            PrintWriter writerCSV,
-            PrintWriter writerTiempo
+            PrintWriter writerCSV
     ) throws IOException {
-
-        long inicioArchivo = System.currentTimeMillis();
 
         int[][] distancias =
                 ATSPReader.leerMatrizATSP(archivo);
@@ -118,16 +101,6 @@ public class Main {
             );
         }
 
-        double tiempoArchivo =
-                calcularTiempoSegundos(inicioArchivo);
-
-        writerTiempo.println(
-                "Archivo: " +
-                        archivo +
-                        " Tiempo: " +
-                        tiempoArchivo +
-                        " segundos"
-        );
     }
 
     private static void ejecutarConfiguraciones(
@@ -188,13 +161,13 @@ public class Main {
             EstrategiaReemplazo reemplazo
     ) {
 
-        double[] fitnessCorridas =
-                new double[REPETICIONES];
+        int[] costosCorridas = new int[REPETICIONES];
 
-        double mejorFitness =
-                Double.NEGATIVE_INFINITY;
+        int mejorCosto = Integer.MAX_VALUE;
 
         Individuo mejorIndividuo = null;
+
+        double tiempoTotal = 0;
 
         for (int repeticion = 0;
              repeticion < REPETICIONES;
@@ -221,30 +194,28 @@ public class Main {
                             distancias
                     );
 
+            long inicio = System.nanoTime();
+
             Individuo mejor =
                     algoritmo.ejecutar();
 
-            fitnessCorridas[repeticion] =
-                    mejor.getFitness();
+            long fin = System.nanoTime();
 
-            if (mejor.getFitness() > mejorFitness) {
+            tiempoTotal += (fin - inicio) / 1_000_000_000.0;
 
-                mejorFitness =
-                        mejor.getFitness();
+            costosCorridas[repeticion] = mejor.getCosto();
 
-                mejorIndividuo =
-                        new Individuo(mejor);
+            if (mejor.getCosto() < mejorCosto) {
+                mejorCosto = mejor.getCosto();
+                mejorIndividuo = new Individuo(mejor);
             }
         }
 
-        double promedio =
-                calcularPromedio(fitnessCorridas);
+        double promedioCosto =
+                calcularPromedio(costosCorridas);
 
-        double desvio =
-                calcularDesvio(
-                        fitnessCorridas,
-                        promedio
-                );
+        double desvioCosto =
+                calcularDesvio(costosCorridas, promedioCosto);
 
         String nombreConfiguracion =
                 seleccion.getNombre() + "-" +
@@ -254,9 +225,10 @@ public class Main {
 
         return new ResultadoExperimento(
                 nombreConfiguracion,
-                promedio,
-                mejorFitness,
-                desvio,
+                promedioCosto,
+                mejorCosto,
+                desvioCosto,
+                tiempoTotal,
                 mejorIndividuo
         );
     }
@@ -268,19 +240,29 @@ public class Main {
             ResultadoExperimento resultado
     ) {
 
-        int costo = -1;
-
         String recorrido = "";
 
         if (resultado.mejorIndividuo != null) {
-
-            costo =
-                    resultado.mejorIndividuo.getCosto();
-
-            recorrido =
-                    resultado.mejorIndividuo
-                            .getRecorridoComoTexto();
+            recorrido = resultado.mejorIndividuo.getRecorridoComoTexto();
         }
+
+        String promedio = String.format(
+                new Locale("es", "AR"),
+                "%.4f",
+                resultado.promedioCosto
+        );
+
+        String desvio = String.format(
+                new Locale("es", "AR"),
+                "%.4f",
+                resultado.desvioCosto
+        );
+
+        String tiempo = String.format(
+                new Locale("es", "AR"),
+                "%.4f",
+                resultado.tiempoTotal
+        );
 
         writerCSV.println(
                 archivo + ";" +
@@ -288,10 +270,10 @@ public class Main {
                         configuracion.getTamanoPoblacion() + ";" +
                         configuracion.getProbCruce() + ";" +
                         configuracion.getProbMutacion() + ";" +
-                        resultado.promedio + ";" +
-                        resultado.mejorFitness + ";" +
-                        resultado.desvio + ";" +
-                        costo + ";" +
+                        resultado.mejorCosto + ";" +
+                        promedio + ";" +
+                        desvio + ";" +
+                        tiempo + ";" +
                         recorrido
         );
     }
@@ -327,52 +309,32 @@ public class Main {
                 "Archivo;Configuracion;" +
                         "Poblacion;ProbCruce;" +
                         "ProbMutacion;" +
-                        "PromedioFitness;" +
-                        "MejorFitness;" +
-                        "Desvio;" +
-                        "CostoMejor;" +
+                        "MejorCosto;" +
+                        "PromedioCosto;" +
+                        "DesvioCosto;" +
+                        "TiempoTotal;" +
                         "Recorrido"
         );
     }
 
-    private static double calcularPromedio(
-            double[] valores
-    ) {
-
+    private static double calcularPromedio(int[] valores) {
         double suma = 0;
 
-        for (double valor : valores) {
-
+        for (int valor : valores) {
             suma += valor;
         }
 
         return suma / valores.length;
     }
 
-    private static double calcularDesvio(
-            double[] valores,
-            double promedio
-    ) {
-
+    private static double calcularDesvio(int[] valores, double promedio) {
         double sumaVarianza = 0;
 
-        for (double valor : valores) {
-
-            sumaVarianza +=
-                    Math.pow(valor - promedio, 2);
+        for (int valor : valores) {
+            sumaVarianza += Math.pow(valor - promedio, 2);
         }
 
-        return Math.sqrt(
-                sumaVarianza / valores.length
-        );
-    }
-
-    private static double calcularTiempoSegundos(
-            long inicio
-    ) {
-
-        return (System.currentTimeMillis() - inicio)
-                / 1000.0;
+        return Math.sqrt(sumaVarianza / valores.length);
     }
 
     private static ArrayList<EstrategiaSeleccion>
@@ -431,26 +393,31 @@ public class Main {
 
         private String configuracion;
 
-        private double promedio;
+        private double promedioCosto;
 
-        private double mejorFitness;
+        private int mejorCosto;
 
-        private double desvio;
+        private double desvioCosto;
+
+        private double tiempoTotal;
 
         private Individuo mejorIndividuo;
 
+
         public ResultadoExperimento(
                 String configuracion,
-                double promedio,
-                double mejorFitness,
-                double desvio,
+                double promedioCosto,
+                int mejorCosto,
+                double desvioCosto,
+                double tiempoTotal,
                 Individuo mejorIndividuo
         ) {
 
             this.configuracion = configuracion;
-            this.promedio = promedio;
-            this.mejorFitness = mejorFitness;
-            this.desvio = desvio;
+            this.promedioCosto = promedioCosto;
+            this.mejorCosto = mejorCosto;
+            this.desvioCosto = desvioCosto;
+            this.tiempoTotal = tiempoTotal;
             this.mejorIndividuo = mejorIndividuo;
         }
     }
