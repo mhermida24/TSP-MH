@@ -296,7 +296,7 @@ public class Main {
                         reemplazo.getNombre() +
                         " | Config: " +
                         config +
-                        " | Repetición: " +
+                        " | Repeticion: " +
                         (repeticion + 1)
         );
     }
